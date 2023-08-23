@@ -8,7 +8,7 @@
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-      fetch('MomRawData(3).csv') // Updated CSV file path
+      fetch('MomDataRaw(3).csv') // Updated CSV file path
         .then(response => response.text())
         .then(csvData => {
           var lines = csvData.split('\n');
@@ -43,13 +43,8 @@
               maxAlternation: 1
             },
             vAxis: {
-              title: 'Value',
-              viewWindow: {
-                min: 0,     // Set the minimum value for the y-axis
-                max: 12000  // Set the maximum value for the y-axis
-              }
-            },
-            chartArea: { height: '70%', width: '80%' } // Adjust the chart area to prevent data cut-off
+              title: 'Value'
+            }
           };
 
           var chart = new google.visualization.ChartWrapper({
@@ -70,6 +65,7 @@
           var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'));
           dashboard.bind(control, chart);
           dashboard.draw(data);
+
         });
     }
   </script>
