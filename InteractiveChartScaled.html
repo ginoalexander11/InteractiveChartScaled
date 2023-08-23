@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Charts Example</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      fetch('MomRawData(3).csv')
+        .then(response => response.text())
+        .then(csvData => {
+          var lines = csvData.split('\n');
+          var data = new google.visualization.DataTable();
+          data.addColumn('date', 'Date');
+
+          // Add columns for each decile
+          for (var i = 1; i <= 10; i++) {
+            data.addColumn('number', 'Decile ' + i);
+          }
+
+          for (var i = 1; i < lines.length; i++) {
+            var parts = lines[i].split(',');
+            var dateParts = parts[0].split('/');
+            var date = new Date(dateParts[2], dateParts[0] - 1, dateParts[1]);
+
+            var row = [date];
+            for (var j = 1; j <= 10; j++) {
+              row.push(parseFloat(parts[j]));
+            }
+
+            data.addRow(row);
+          }
+
+          var options = {
+            width: 1600,
+            height: 800,
+            chartArea: {
+              width: '75%'
+            },
+            hAxis: {
+              format: 'MM/dd/yyyy',
+              slantedText: false,
+              maxAlternation: 1
+            },
+            vAxis: {
+              title: 'Value',
+              viewWindow: {
+                max: 12000
+              }
+            }
+          };
+
+          // Create the chart
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+          // Draw the chart
+          chart.draw(data, options);
+        });
+    }
+  </script>
+</head>
+<body>
+  <div id="chart_div"></div>
+</body>
+</html>
