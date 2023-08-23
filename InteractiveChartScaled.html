@@ -4,18 +4,18 @@
   <title>Google Charts Example</title>
   <script src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.load('current', { packages: ['corechart', 'controls'] });
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-      fetch('MomRawData(3).csv')
+      fetch('MomDataUpdateArithmetic.csv') // Updated CSV file path
         .then(response => response.text())
         .then(csvData => {
           var lines = csvData.split('\n');
           var data = new google.visualization.DataTable();
           data.addColumn('date', 'Date');
 
-          // Add columns for each decile
+          // Dynamically add columns for each decile
           for (var i = 1; i <= 10; i++) {
             data.addColumn('number', 'Decile ' + i);
           }
@@ -34,11 +34,9 @@
           }
 
           var options = {
-            width: 1600,
-            height: 800,
-            chartArea: {
-              width: '75%'
-            },
+            width: 800,
+            height: 400,
+            title: 'Decile Performance Over Time',
             hAxis: {
               format: 'MM/dd/yyyy',
               slantedText: false,
@@ -47,21 +45,38 @@
             vAxis: {
               title: 'Value',
               viewWindow: {
-                max: 12000
+                max: 12000 // Set the maximum value for the y-axis
               }
             }
           };
 
-          // Create the chart
-          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          var chart = new google.visualization.ChartWrapper({
+            chartType: 'LineChart',
+            containerId: 'chart_div',
+            options: options,
+            dataTable: data
+          });
 
-          // Draw the chart
-          chart.draw(data, options);
+          var control = new google.visualization.ControlWrapper({
+            controlType: 'ChartRangeFilter',
+            containerId: 'filter_div',
+            options: {
+              filterColumnLabel: 'Date'
+            }
+          });
+
+          var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'));
+          dashboard.bind(control, chart);
+          dashboard.draw(data);
+
         });
     }
   </script>
 </head>
 <body>
-  <div id="chart_div"></div>
+  <div id="dashboard">
+    <div id="chart_div"></div>
+    <div id="filter_div"></div>
+  </div>
 </body>
 </html>
